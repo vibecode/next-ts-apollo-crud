@@ -1,42 +1,41 @@
 import React from 'react'
 import { NextPage } from 'next'
+import { TaskStatus, useTasksQuery } from '../generated/graphql'
+import Layout from '../components/Layout'
+import TaskList from '../components/TaskList'
 import { withApollo } from '../lib/apollo'
-import { TasksComponent, TaskStatus } from '../generated/graphql'
 
-interface InitialProps {
-  greeting: string
-}
+interface InitialProps {}
 
 interface Props extends InitialProps {}
 
 const IndexPage: NextPage<Props, InitialProps> = props => {
+  const { loading, error, data, refetch } = useTasksQuery({
+    fetchPolicy: 'cache-and-network'
+  })
+  const tasks = data && data.tasks ? data.tasks : []
   return (
-    <div>
-      <TasksComponent variables={{ status: TaskStatus.Active }}>
-        {({ loading, error, data }) => {
-          if (loading) return <p>loading</p>
-          if (error) return <p>Error</p>
-
-          const tasks = data && data.tasks ? data.tasks : []
-
-          return (
-            <ul>
-              {tasks.map(({ title, status, id }) => (
-                <li key={id}>
-                  <p>{title}</p>
-                  <p>{status}</p>
-                </li>
-              ))}
-            </ul>
-          )
-        }}
-      </TasksComponent>
-    </div>
+    <Layout>
+      {loading && (!data || !data.tasks) ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p>An error occurred.</p>
+      ) : (
+        <>
+          <TaskList tasks={tasks} />
+        </>
+      )}
+    </Layout>
   )
 }
 
-IndexPage.getInitialProps = async () => ({
-  greeting: 'Hi username'
+IndexPage.getInitialProps = async ctx => ({
+  filter: {
+    status:
+      typeof ctx.query.status === 'string'
+        ? (ctx.query.status as TaskStatus)
+        : undefined
+  }
 })
 
 export default withApollo({ ssr: true })(IndexPage)
