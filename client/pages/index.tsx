@@ -3,6 +3,7 @@ import { NextPage } from 'next'
 import { TaskStatus, useTasksQuery } from '../generated/graphql'
 import Layout from '../components/Layout'
 import TaskList from '../components/TaskList'
+import CreateTaskForm from '../components/CreateTaskForm'
 import { withApollo } from '../lib/apollo'
 
 interface InitialProps {}
@@ -22,6 +23,7 @@ const IndexPage: NextPage<Props, InitialProps> = props => {
         <p>An error occurred.</p>
       ) : (
         <>
+          <CreateTaskForm onTaskCreated={refetch} />
           <TaskList tasks={tasks} />
         </>
       )}
