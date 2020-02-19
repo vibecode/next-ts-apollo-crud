@@ -5,14 +5,18 @@ import Layout from '../components/Layout'
 import TaskList from '../components/TaskList'
 import CreateTaskForm from '../components/CreateTaskForm'
 import { withApollo } from '../lib/apollo'
+import TaskFilter, { ITaskFilter } from '../components/TaskFilter'
 
-interface InitialProps {}
+interface InitialProps {
+  filter: ITaskFilter
+}
 
 interface Props extends InitialProps {}
 
-const IndexPage: NextPage<Props, InitialProps> = props => {
+const IndexPage: NextPage<Props, InitialProps> = ({ filter }) => {
   const { loading, error, data, refetch } = useTasksQuery({
-    fetchPolicy: 'cache-and-network'
+    fetchPolicy: 'cache-and-network',
+    variables: filter
   })
   const tasks = data && data.tasks ? data.tasks : []
   return (
@@ -24,7 +28,8 @@ const IndexPage: NextPage<Props, InitialProps> = props => {
       ) : (
         <>
           <CreateTaskForm onTaskCreated={refetch} />
-          <TaskList tasks={tasks} />
+          <TaskList tasks={tasks} filter={filter} />
+          <TaskFilter filter={filter} />
         </>
       )}
     </Layout>

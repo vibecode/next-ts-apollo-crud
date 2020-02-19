@@ -11,7 +11,7 @@ interface Props {
   initialInput: FormState
 }
 
-const UpdateTaskForm: React.FunctionComponent<Props> = ({ initialInput }) => {
+const UpdateTaskForm: React.FC<Props> = ({ initialInput }) => {
   const [formState, setFormState] = useState<FormState>(initialInput)
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target
